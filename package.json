@@ -1,0 +1,12 @@
+{
+  "name": "iadvize-test",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "~4.11.1",
+    "pg": "^4.2.0"
+  }
+}
