@@ -52,7 +52,8 @@ router.get('/api/posts', function(req, res) {
   if (req.query.author !== null && req.query.author !== undefined) {
     query = client.query('SELECT * FROM Post WHERE author=($1) ORDER BY id ASC;', [req.query.author]);
   }
-  else if (req.query.from !== null && req.query.from !== undefined && req.query.to !== null && req.query.to !== undefined) {
+  else if (req.query.from !== null && req.query.from !== undefined && req.query.to !== null && req.query.to !== undefined &&
+           moment(req.query.from, 'YYYY-MM-DD', true).isValid() && moment(req.query.to, 'YYYY-MM-DD', true).isValid()) {
     query = client.query('SELECT * FROM Post WHERE date BETWEEN to_date(($1),\'YYYY-MM-DD\') AND to_date(($2),\'YYYY-MM-DD\') ORDER BY id ASC;',
       [req.query.from, req.query.to]);
   }
@@ -61,9 +62,9 @@ router.get('/api/posts', function(req, res) {
   }
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
+    result.count++;
     result.posts.push(row);
   });
-  result.count = result.posts.length;
 
   // Return results
   query.on('end', function() {
