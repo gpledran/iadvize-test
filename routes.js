@@ -41,20 +41,24 @@ router.post('/api/posts', function(req, res) {
 
 router.get('/api/posts', function(req, res) {
 
-  // Grab URL parameters
-  var where = '1=1 ';
-  if (req.query.author !== null && req.query.author !== undefined) {
-    where += "AND author ='" + req.query.author + "'";
-    console.log(req.query.author);
-  }
-
   var result = {
     posts : [],
     count : 0
   };
 
   // Select Posts and push into results
-  var query = client.query('SELECT * FROM Post ORDER BY id ASC;');
+  var query = null;
+  // Grab URL parameters
+  if (req.query.author !== null && req.query.author !== undefined) {
+    query = client.query('SELECT * FROM Post WHERE author=($1) ORDER BY id ASC;', [req.query.author]);
+  }
+  else if (req.query.from !== null && req.query.from !== undefined && req.query.to !== null && req.query.to !== undefined) {
+    query = client.query('SELECT * FROM Post WHERE date BETWEEN to_date(($1),\'YYYY-MM-DD\') AND to_date(($2),\'YYYY-MM-DD\') ORDER BY id ASC;',
+      [req.query.from, req.query.to]);
+  }
+  else {
+    query = client.query('SELECT * FROM Post ORDER BY id ASC;');
+  }
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
     result.posts.push(row);
