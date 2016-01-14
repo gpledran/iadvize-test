@@ -9,5 +9,5 @@ var connectionString = 'postgres://' +
 var client = new pg.Client(connectionString);
 client.connect();
 
-var query = client.query('CREATE TABLE IF NOT EXISTS Posts(id SERIAL PRIMARY KEY, content TEXT not null, author TEXT not null, date DATE not null)');
+var query = client.query('CREATE TABLE IF NOT EXISTS Post(id SERIAL PRIMARY KEY, content TEXT not null, author TEXT not null, date DATE not null)');
 query.on('end', function() { client.end(); });
