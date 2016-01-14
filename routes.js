@@ -39,4 +39,47 @@ router.post('/api/posts', function(req, res) {
   });
 });
 
+router.get('/api/posts', function(req, res) {
+
+  var result = {
+    posts : [],
+    count : 0
+  };
+
+  // Select Posts and push into results
+  var query = client.query('SELECT * FROM Post ORDER BY id ASC;');
+  query.on('row', function(row) {
+    row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
+    result.posts.push(row);
+  });
+  result.count = result.posts.length;
+
+  // Return results
+  query.on('end', function() {
+    return res.json(result);
+  });
+});
+
+router.get('/api/posts/:id', function(req, res) {
+
+  // Grab id from the URL parameters
+  var id = req.params.id;
+
+  var result = {
+    post : []
+  };
+
+  // Get Post
+  var query = client.query('SELECT * FROM Post WHERE id=($1)', [id]);
+  query.on('row', function(row) {
+    row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
+    result.post.push(row);
+  });
+
+  // Return results
+  query.on('end', function() {
+    return res.json(result);
+  });
+});
+
 module.exports = router;
