@@ -16,6 +16,11 @@ This is an application built with Node, Express and PostgreSQL.
 2. We will first need to run server: `$ npm start`
 3. Get the last 200 articles `$ phantomjs getLastVDM.js`
 
+## Unit testing
+
+1. We will first need to run server: `$ npm start`
+2. Run `$ npm test`
+
 ## Custom PostgreSQL config
 
 Edit the file `config.js` and set your own connection informations

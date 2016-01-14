@@ -41,6 +41,13 @@ router.post('/api/posts', function(req, res) {
 
 router.get('/api/posts', function(req, res) {
 
+  // Grab URL parameters
+  var where = '1=1 ';
+  if (req.query.author !== null && req.query.author !== undefined) {
+    where += "AND author ='" + req.query.author + "'";
+    console.log(req.query.author);
+  }
+
   var result = {
     posts : [],
     count : 0
