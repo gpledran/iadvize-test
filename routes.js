@@ -1,40 +1,39 @@
+'use strict';
+
 var express = require('express');
 var moment = require('moment');
 var router = express.Router();
-var path = require('path');
-var pg = require('pg');
-var config = require(path.join(__dirname, 'config'));
-
-// Connect Postgres
-var connectionString = 'postgres://' +
-  ((config.username !== '' && config.password !== '') ? (config.username + ':' + config.password + '@') : '') +
-  'localhost/' + config.dbname;
-
-var client = new pg.Client(connectionString);
-client.connect();
+var client = require('./lib/db')();
 
 router.post('/api/posts', function(req, res) {
 
   // Grab data from http request
   var data = req.body.articles;
 
-  var ids = [];
-  var query = null;
+  var ids         = [];
+  var query       = null;
+  var valuesIndex = 0;
+  var values      = [];
+  var queryParams = [];
 
-  // Insert Posts
-  data.forEach(function (post, index) {
-    if (index < 200) {
-      query = client.query('INSERT INTO Post(content, author, date) values($1, $2, $3) RETURNING id', [post.content, post.author, moment(post.date, 'DD/MM/YYYY')]);
+  data.forEach(function (post) {
+    values.push('($' + (++valuesIndex) + ', $' + (++valuesIndex) + ', $' + (++valuesIndex) + ')');
+    queryParams.push(post.content);
+    queryParams.push(post.author);
+    queryParams.push(moment(post.date, 'DD/MM/YYYY'));
+  });
 
-      query.on('error', function (err) {
-        console.log(err);
-      });
+  query = client.query('INSERT INTO Post(content, author, date) VALUES' + values.join(',') + ' RETURNING id', queryParams);
 
-      // Add id to return data
-      query.on('row', function (row) {
-        ids.push(row.id);
-      });
-    }
+  query.on('error', function (err) {
+    console.error(err);
+    res.status(400);
+    res.end('Bad request');
+  });
+
+  // Add id to return data
+  query.on('row', function (row) {
+    ids.push(row.id);
   });
 
   // Return results
@@ -43,6 +42,10 @@ router.post('/api/posts', function(req, res) {
   });
 });
 
+/**
+ * API GET /api/posts
+ * Will return ....
+ */
 router.get('/api/posts', function(req, res) {
 
   var result = {
@@ -72,17 +75,19 @@ router.get('/api/posts', function(req, res) {
   var query = client.query(queryText, queryParams);
 
   query.on('error', function (err) {
-    console.log(err);
+    console.error(err);
+    res.status(400);
+    res.end('Bad request');
   });
 
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
-    result.count++;
     result.posts.push(row);
   });
 
   // Return results
   query.on('end', function() {
+    result.count = result.posts.length;
     return res.json(result);
   });
 });
@@ -93,19 +98,21 @@ router.get('/api/posts/:id', function(req, res) {
   var id = req.params.id;
 
   var result = {
-    post : []
+    post : {}
   };
 
   // Get Post
   var query = client.query('SELECT * FROM Post WHERE id=($1)', [id]);
 
   query.on('error', function (err) {
-    console.log(err);
+    console.error(err);
+    res.status(400);
+    res.end('Bad request');
   });
 
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
-    result.post.push(row);
+    result.post = row;
   });
 
   // Return results
