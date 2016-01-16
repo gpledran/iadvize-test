@@ -26,6 +26,10 @@ router.post('/api/posts', function(req, res) {
     if (index < 200) {
       query = client.query('INSERT INTO Post(content, author, date) values($1, $2, $3) RETURNING id', [post.content, post.author, moment(post.date, 'DD/MM/YYYY')]);
 
+      query.on('error', function (err) {
+        console.log(err);
+      });
+
       // Add id to return data
       query.on('row', function (row) {
         ids.push(row.id);
@@ -46,20 +50,31 @@ router.get('/api/posts', function(req, res) {
     count : 0
   };
 
-  // Select Posts and push into results
-  var query = null;
+  var queryText = 'SELECT * FROM Post WHERE 1=1 ';
+  var queryParams = [];
+
   // Grab URL parameters
   if (req.query.author !== null && req.query.author !== undefined) {
-    query = client.query('SELECT * FROM Post WHERE author=($1) ORDER BY id ASC;', [req.query.author]);
+    queryParams.push(req.query.author);
+    queryText += 'AND author=($' + queryParams.length + ') ';
   }
-  else if (req.query.from !== null && req.query.from !== undefined && req.query.to !== null && req.query.to !== undefined &&
-           moment(req.query.from, 'YYYY-MM-DD', true).isValid() && moment(req.query.to, 'YYYY-MM-DD', true).isValid()) {
-    query = client.query('SELECT * FROM Post WHERE date BETWEEN to_date(($1),\'YYYY-MM-DD\') AND to_date(($2),\'YYYY-MM-DD\') ORDER BY id ASC;',
-      [req.query.from, req.query.to]);
+  if (req.query.from !== null && req.query.from !== undefined && moment(req.query.from, 'YYYY-MM-DD', true).isValid()) {
+    queryParams.push(req.query.from);
+    queryText += 'AND date >= to_date(($' + queryParams.length + '),\'YYYY-MM-DD\') ';
   }
-  else {
-    query = client.query('SELECT * FROM Post ORDER BY id ASC;');
+  if (req.query.to !== null && req.query.to !== undefined && moment(req.query.to, 'YYYY-MM-DD', true).isValid()) {
+    queryParams.push(req.query.to);
+    queryText += 'AND date <= to_date(($' + queryParams.length + '),\'YYYY-MM-DD\') ';
   }
+  queryText += 'ORDER BY id ASC;';
+
+  // Select Posts and push into results
+  var query = client.query(queryText, queryParams);
+
+  query.on('error', function (err) {
+    console.log(err);
+  });
+
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
     result.count++;
@@ -83,6 +98,11 @@ router.get('/api/posts/:id', function(req, res) {
 
   // Get Post
   var query = client.query('SELECT * FROM Post WHERE id=($1)', [id]);
+
+  query.on('error', function (err) {
+    console.log(err);
+  });
+
   query.on('row', function(row) {
     row.date = moment(row.date).format('YYYY-MM-DD HH:mm:ss');
     result.post.push(row);
