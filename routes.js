@@ -6,7 +6,7 @@ var router = express.Router();
 var client = require('./lib/db')();
 
 /**
- * API GET /api/posts
+ * API POST /api/posts
  * @param  {Object}   req   request object
  * @param  {Object}   res   response object
  * Will saved in database VDMs posts
@@ -102,7 +102,7 @@ router.get('/api/posts', function(req, res) {
 });
 
 /**
- * API GET /api/posts
+ * API GET /api/posts/:id
  * @param  {Object}   req   request object
  * @param  {Object}   res   response object
  * Will return VDM post as a JSON object
