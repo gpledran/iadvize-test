@@ -15,12 +15,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/', routes);
 
-// Catch 404
+/**
+ * Catch 404
+ * @param  {Object}   req   request object
+ * @param  {Object}   res   response object
+ * @param  {Object}   next  next route
+ * Send 404 error
+ */
 app.use(function(req, res, next) {
   res.status(404).send('Not found');
 });
 
-// Error handler : print stacktrace
+/**
+ * Catch 404
+ * @param  {Object}   req   request object
+ * @param  {Object}   res   response object
+ * @param  {Object}   next  next route
+ * Send & print stacktrace
+ */
 app.use(function(err, req, res, next) {
   console.error(err.stack);
   res.status(err.status || 500).send(err.message);

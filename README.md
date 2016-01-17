@@ -36,9 +36,10 @@ This is an application built with Node, Express and PostgreSQL.
 Edit the file `config.js` and set your own connection informations
 
 ## Regrets
-- Don't get and store IDs VDM posts : relaunch getLastVDM script add same posts.
-- POST last 200 VDMs on API instead of saving in database directly from getLastVDM script, because of PhantomJS uses.
 
 <p align="center">
-<img src="./gifs/done.gif" width="50%" />
+<img src="./gifs/done.gif" width="70%" />
 </p>
+
+- Don't get and store IDs VDM posts : relaunch getLastVDM script add same posts.
+- POST last 200 VDMs on API instead of saving in database directly from getLastVDM script, because of PhantomJS uses.

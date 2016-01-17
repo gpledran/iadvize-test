@@ -5,6 +5,12 @@ var moment = require('moment');
 var router = express.Router();
 var client = require('./lib/db')();
 
+/**
+ * API GET /api/posts
+ * @param  {Object}   req   request object
+ * @param  {Object}   res   response object
+ * Will saved in database VDMs posts
+ */
 router.post('/api/posts', function(req, res) {
 
   // Grab data from http request
@@ -44,7 +50,10 @@ router.post('/api/posts', function(req, res) {
 
 /**
  * API GET /api/posts
- * Will return ....
+ * @param  {Object}   req   request object
+ * @param  {Object}   res   response object
+ * @param  {Function} f     f(err)
+ * Will return VDMs posts as a JSON object
  */
 router.get('/api/posts', function(req, res) {
 
@@ -92,6 +101,12 @@ router.get('/api/posts', function(req, res) {
   });
 });
 
+/**
+ * API GET /api/posts
+ * @param  {Object}   req   request object
+ * @param  {Object}   res   response object
+ * Will return VDM post as a JSON object
+ */
 router.get('/api/posts/:id', function(req, res) {
 
   // Grab id from the URL parameters
