@@ -1,4 +1,4 @@
-# iAdvize VDM back-end test
+# VDM back-end test
 
 This is an application built with Node, Express and PostgreSQL.
 
@@ -6,7 +6,7 @@ This is an application built with Node, Express and PostgreSQL.
 
 1. Clone the repo
 2. Install dependencies: `$ npm install`
-3. Start your Postgres server and create a database called `iadvize_db`
+3. Start your Postgres server and create a database called `vdm_db`
 4. Create the database tables: `$ node lib/database`
 5. Start the server: `$ npm start`
 
@@ -26,7 +26,7 @@ This is an application built with Node, Express and PostgreSQL.
 
 ## Unit testing
 
-1. Create a new database called `idavize_db_test`
+1. Create a new database called `vdm_db_test`
 2. Create the database tables: `$ node lib/database --test`
 3. We will first need to run server: `$ npm start -- --test`
 4. Run in another terminal `$ npm test`
